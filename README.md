@@ -77,3 +77,8 @@ def generate(self, query, context_chunks, temperature):
 | Chat Interface | Temperature Study |
 |---|---|
 | *(screenshot)* | *(screenshot)* |
+
+## Live Demo
+
+- **Frontend**: [GitHub Pages](https://anupama-bollampalli.github.io/rag-document-chat/)
+- **Backend API**: [HF Space](https://abollampalli-rag-document-chat.hf.space)
