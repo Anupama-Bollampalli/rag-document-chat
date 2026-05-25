@@ -4,7 +4,7 @@ import ChatInterface from './components/ChatInterface'
 import DocumentUploader from './components/DocumentUploader'
 import TemperatureStudy from './components/TemperatureStudy'
 
-const API = 'http://localhost:8000'
+const API = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
 export default function App() {
   const [tab, setTab] = useState<'chat' | 'temp'>('chat')
