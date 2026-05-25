@@ -1,8 +1,11 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from rag_engine import ingest_document, retrieve, list_documents
-from mock_llm import MockLLM
+import llm as llm_module
 
 app = FastAPI(title="RAG Document Chat API")
 
@@ -13,7 +16,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-llm = MockLLM()
 TEMPERATURES = [0.0, 0.5, 1.0, 1.5]
 
 
@@ -52,8 +54,9 @@ def chat(req: ChatRequest):
     if not chunks:
         return {"answer": "No documents uploaded yet. Please upload a document first.", "sources": []}
     context_texts = [c["text"] for c in chunks]
-    answer = llm.generate(req.query, context_texts, req.temperature)
-    return {"answer": answer, "sources": chunks, "temperature": req.temperature}
+    answer = llm_module.generate(req.query, context_texts, req.temperature)
+    return {"answer": answer, "sources": chunks, "temperature": req.temperature,
+            "model": "groq" if llm_module._USE_GROQ else "mock"}
 
 
 @app.post("/temperature-study")
@@ -67,7 +70,7 @@ def temperature_study(req: TempStudyRequest):
 
     results = []
     for temp in TEMPERATURES:
-        answer = llm.generate(req.query, context_texts, temp)
+        answer = llm_module.generate(req.query, context_texts, temp)
         words = answer.split()
         unique_ratio = round(len(set(words)) / max(len(words), 1), 3)
         results.append({
