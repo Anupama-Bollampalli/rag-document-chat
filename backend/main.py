@@ -7,7 +7,11 @@ from pydantic import BaseModel
 from rag_engine import ingest_document, retrieve, list_documents
 import llm as llm_module
 
-app = FastAPI(title="RAG Document Chat API")
+app = FastAPI(
+    title="RAG Document Chat API",
+    description="Upload documents and chat with them using RAG. Compare LLM responses across temperature settings.",
+    version="1.0.0",
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -28,9 +32,21 @@ class TempStudyRequest(BaseModel):
     query: str
 
 
+@app.get("/")
+def root():
+    return {
+        "name": "RAG Document Chat API",
+        "version": "1.0.0",
+        "status": "running",
+        "llm": "groq" if llm_module._USE_GROQ else "mock",
+        "docs": "/docs",
+        "endpoints": ["/health", "/documents", "/upload", "/chat", "/temperature-study"],
+    }
+
+
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok", "llm": "groq" if llm_module._USE_GROQ else "mock"}
 
 
 @app.get("/documents")
